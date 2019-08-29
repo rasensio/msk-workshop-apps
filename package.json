@@ -4,7 +4,8 @@
   "description": "MSK Workshop Producer App",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "producer": "npm install && node producer.js",
+    "consumer": "npm install && node consumer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Rodrigo Asensio - @rasensio",
