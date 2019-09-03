@@ -1,6 +1,7 @@
 const kafka = require('kafka-node')
 const bp = require('body-parser')
 var emoji = require('node-emoji')
+var location = require('random-location')
 
 
 // parse and vaildates intiial arguments
@@ -29,8 +30,16 @@ const config = {
   kafka_topic: args._[1]
 }
 
+// set the random location code
+const locatioAws = {
+  latitude: 47.6181527,
+  longitude: -122.3425197
+}
+const locationRadius = 70000 // meters
+
 console.log(config)
 
+// starts the client connection
 try {
   const Producer = kafka.Producer
   const client = new kafka.KafkaClient({
@@ -51,20 +60,33 @@ try {
     }
   ];
 
+  // declare empty randomPoint
+  var randomPoint
+
   producer.on('ready', async function() {
-    let push_status = producer.send(payloads, (err, data) => {
-      if (err) {
-        console.log(err)
-        console.log('[kafka-producer -> '+kafka_topic+']: broker update failed')
-      } else {
-        console.log('[kafka-producer -> '+kafka_topic+']: broker update success')
+    while (true) {
+      randomPoint = randomLocation.randomCircumferencePoint(locatioAws, locationRadius)
+      let message = {
+        timestamp: new Date(),
+        latitude: randomPoint.latitude,
+        longitude: randomPoint.longitude,
+        temperature: Math.floor(Math.random() * 12)
       }
-    })
+      let push_status = producer.send(payloads, (err, data) => {
+        if (err) {
+          console.log('Operation failed: ')
+          console.log(err)
+        } else {
+          console.log('Operation succesful')
+          console.log(data)
+        }
+      })
+    }
   })
 
   producer.on('error', function(err) {
+    console.log('Operation failed: ')
     console.log(err);
-    console.log('[kafka-producer -> '+kafka_topic+']: connection errored');
     throw err;
   })
 }

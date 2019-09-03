@@ -45,24 +45,18 @@ try {
     partitions: 2,
     replicationFactor: 3
   }]
+
+  client.createTopics(topics, (err, result) => {
+    if (err) {
+      console.log('Operation failed: ')
+      console.log(err)
+    } else {
+      console.log('Operation succesful')
+      console.log(result)
+    }
+  })
+
   
-  producer.on('ready', async function() {
-
-    client.createTopics(topics, (error, result) => {
-      if (err) {
-        console.log(err)
-        console.log('[kafka-topic -> '+kafka_topic+']: broker update failed')
-      } else {
-        console.log('[kafka-topic -> '+kafka_topic+']: broker update success')
-      }
-    })
-  })
-
-  producer.on('error', function(err) {
-    console.log(err);
-    console.log('[kafka-topic -> '+kafka_topic+']: connection errored');
-    throw err;
-  })
 }
 catch(e) {
   console.log(e);
