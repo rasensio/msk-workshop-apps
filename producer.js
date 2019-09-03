@@ -65,6 +65,7 @@ try {
 
   producer.on('ready', async function() {
     while (true) {
+      // create the message
       randomPoint = randomLocation.randomCircumferencePoint(locatioAws, locationRadius)
       let message = {
         timestamp: new Date(),
@@ -72,6 +73,8 @@ try {
         longitude: randomPoint.longitude,
         temperature: Math.floor(Math.random() * 12)
       }
+      // log the message
+      console,log(emoji.get('fire') + ' sending: date: ' + message.date + ' temp: ' +  message.temperature)
       let push_status = producer.send(payloads, (err, data) => {
         if (err) {
           console.log('Operation failed: ')
