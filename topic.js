@@ -32,7 +32,6 @@ const config = {
 console.log(config)
 
 try {
-  const Producer = kafka.Producer
   const client = new kafka.KafkaClient({
     kafkaHost: config.kafka_server,
     connectTimeout: 5000,
@@ -41,30 +40,27 @@ try {
     }    
   })
   
-  const producer = new Producer(client)
-  const kafka_topic = config.kafka_topic
+  const topics = [{
+    topic: config.kafka_topic,
+    partitions: 2,
+    replicationFactor: 3
+  }]
   
-  let payloads = [
-    {
-      topic: kafka_topic,
-      messages: config.kafka_topic
-    }
-  ];
-
   producer.on('ready', async function() {
-    let push_status = producer.send(payloads, (err, data) => {
+
+    client.createTopics(topics, (error, result) => {
       if (err) {
         console.log(err)
-        console.log('[kafka-producer -> '+kafka_topic+']: broker update failed')
+        console.log('[kafka-topic -> '+kafka_topic+']: broker update failed')
       } else {
-        console.log('[kafka-producer -> '+kafka_topic+']: broker update success')
+        console.log('[kafka-topic -> '+kafka_topic+']: broker update success')
       }
     })
   })
 
   producer.on('error', function(err) {
     console.log(err);
-    console.log('[kafka-producer -> '+kafka_topic+']: connection errored');
+    console.log('[kafka-topic -> '+kafka_topic+']: connection errored');
     throw err;
   })
 }
