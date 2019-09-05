@@ -28,21 +28,20 @@ const config = {
   kafka_topic: args._[1]
 }
 
-
 var Consumer = kafka.Consumer,
-  client = new kafka.KafkaClient({
-    kafkaHost: config.kafka_server,
-    connectTimeout: 5000,
-    sslOptions: {
-      rejectUnauthorized: false
-    }
-  }),
-  consumer = new Consumer(client,
-    [{ topic: config.kafka_topic, offset: 0 }],
-    {
-      autoCommit: false
-    }
-  );
+    client = new kafka.KafkaClient({
+      kafkaHost: config.kafka_server,
+      connectTimeout: 5000,
+      sslOptions: {
+        rejectUnauthorized: false
+      }
+    }),
+    consumer = new Consumer(client,
+        [{ topic: config.kafka_topic, offset: 0}],
+        {
+            autoCommit: false
+        }
+    );
 
 consumer.on('message', (message) => {
   console.log(message)

@@ -1,7 +1,6 @@
 const kafka = require('kafka-node')
 const bp = require('body-parser')
 var emoji = require('node-emoji')
-var location = require('random-location')
 
 
 // parse and vaildates intiial arguments
@@ -60,21 +59,22 @@ try {
     }
   ]
 
-  // declare empty randomPoint
-  var randomPoint
-
   const produce = () => {
-    // create the message
-    randomPoint = location.randomCircumferencePoint(locatioAws, locationRadius)
+    // create the message with a random deviceId between 1 and 10
     let message = {
       timestamp: new Date().toISOString(),
-      latitude: randomPoint.latitude,
-      longitude: randomPoint.longitude,
+      deviceId: Math.floor(Math.random() * 10) + 1,
       temperature: Math.floor(Math.random() * 12)
     }
+    message = JSON.stringify(message)
     // log the message
-    console.log('> '  +  JSON.stringify(message))
-    let push_status = producer.send(payloads, (err, data) => {
+    console.log('> ' + message)
+    let payload = {
+      topic: config.kafka_topic,
+      messages: [message]
+    }
+
+    let push_status = producer.send(payload, (err, data) => {
       if (err) {
         console.log('Operation failed: ')
         console.log(err)
