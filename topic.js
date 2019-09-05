@@ -53,6 +53,7 @@ try {
     } else {
       console.log('Operation succesful')
       console.log(result)
+      client.
     }
   })
 

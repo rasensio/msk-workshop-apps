@@ -5,19 +5,18 @@ var emoji = require('node-emoji')
 
 // parse and vaildates intiial arguments
 var args = require('minimist')(process.argv.slice(2))
-console.dir(args)
 
 const usage = () => {
-  console.log("> npm start SERVER TOPIC")
-  console.log("> npm start my.server.com myTopic")
+  console.log("> node consumer $CLUSTER $TOPIC")
+  console.log("> node consumer my.server.com myTopic")
 }
 
-if (!args[0]) {
+if (!args._[0]) {
   console.error(emoji.get('fire') + ' Enter a server name like...')
   usage()
   return
 }
-if (!args[1]) {
+if (!args._[1]) {
   console.error(emoji.get('fire') + ' Enter a topic name like...')
   usage()
   return
@@ -25,35 +24,34 @@ if (!args[1]) {
 
 // set the config
 const config = {
-  kafka_server: args[0],
-  kafka_topic: args[1]
+  kafka_server: args._[0],
+  kafka_topic: args._[1]
 }
 
-try {
-  const Consumer = kafka.HighLevelConsumer;
-  const client = new kafka.Client(config.kafka_server);
-  let consumer = new Consumer(
-    client,
-    [{ topic: config.kafka_topic, partition: 0 }],
+
+var Consumer = kafka.Consumer,
+  client = new kafka.KafkaClient({
+    kafkaHost: config.kafka_server,
+    connectTimeout: 5000,
+    sslOptions: {
+      rejectUnauthorized: false
+    }
+  }),
+  consumer = new Consumer(client,
+    [{ topic: config.kafka_topic, offset: 0 }],
     {
-      autoCommit: true,
-      fetchMaxWaitMs: 1000,
-      fetchMaxBytes: 1024 * 1024,
-      encoding: 'utf8',
-      fromOffset: false
+      autoCommit: false
     }
   );
-  consumer.on('message', async function(message) {
-    console.log('here');
-    console.log(
-      'kafka-> ',
-      message.value
-    );
-  })
-  consumer.on('error', function(err) {
-    console.log('error', err);
-  });
-}
-catch(e) {
-  console.log(e);
-}
+
+consumer.on('message', (message) => {
+  console.log(message)
+});
+
+consumer.on('error', (err) => {
+  console.log('Error:', err)
+})
+
+consumer.on('offsetOutOfRange', (err) => {
+  console.log('offsetOutOfRange:', err)
+})    

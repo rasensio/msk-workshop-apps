@@ -58,39 +58,42 @@ try {
       topic: kafka_topic,
       messages: config.kafka_topic
     }
-  ];
+  ]
 
   // declare empty randomPoint
   var randomPoint
 
-  producer.on('ready', async function() {
-    while (true) {
-      // create the message
-      randomPoint = location.randomCircumferencePoint(locatioAws, locationRadius)
-      let message = {
-        timestamp: new Date().toISOString(),
-        latitude: randomPoint.latitude,
-        longitude: randomPoint.longitude,
-        temperature: Math.floor(Math.random() * 12)
-      }
-      // log the message
-      console.log('> '  +  JSON.stringify(message))
-      let push_status = producer.send(payloads, (err, data) => {
-        if (err) {
-          console.log('Operation failed: ')
-          console.log(err)
-        } else {
-          console.log('Operation succesful')
-          console.log(data)
-        }
-      })
+  const produce = () => {
+    // create the message
+    randomPoint = location.randomCircumferencePoint(locatioAws, locationRadius)
+    let message = {
+      timestamp: new Date().toISOString(),
+      latitude: randomPoint.latitude,
+      longitude: randomPoint.longitude,
+      temperature: Math.floor(Math.random() * 12)
     }
+    // log the message
+    console.log('> '  +  JSON.stringify(message))
+    let push_status = producer.send(payloads, (err, data) => {
+      if (err) {
+        console.log('Operation failed: ')
+        console.log(err)
+      } else {
+        console.log('Operation succesful')
+        console.log(data)
+      }
+    })
+  }
+  
+  producer.on('ready', async function() {
+    setInterval(produce, 100)
   })
+    
 
   producer.on('error', function(err) {
     console.log('Operation failed: ')
-    console.log(err);
-    throw err;
+    console.log(err)
+    throw err
   })
 }
 catch(e) {
