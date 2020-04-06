@@ -13,7 +13,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "kafka-node": "^4.1.3",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "node-emoji": "^1.10.0",
     "random-location": "^1.0.12"
   }
